@@ -18,40 +18,16 @@ function Register() {
 
     const handleRegister = async (e) => {
         e.preventDefault();
-
-        if (username.length < 4 || username.length > 20) {
-            setMessage('Username must be between 4 and 20 characters.');
-            setTimeout(() => setMessage(''), 3000);
-            return;
-        }
-
-        if (password1 !== password2) {
-            setMessage('Passwords do not match.');
-            setTimeout(() => setMessage(''), 3000);
-            return;
-        }
-
-        if (!validatePassword(password1)) {
-            setMessage('Password must be 4-20 characters long, include an uppercase letter, and a special symbol (!@#$%^&*_+).');
-            setTimeout(() => setMessage(''), 3000);
-            return;
-        }
-
+    
         try {
             const response = await axios.post('http://localhost:3000/register', { username, password1, password2 });
             localStorage.setItem('secretCode', response.data.secretCode);
             setMessage(response.data.message);
 
-            setTimeout(() => setMessage(''), 3000);
-
-            // Redirect after 1 second
-            setTimeout(() => {
-                nav('/login');
-            }, 1000);
         } catch (error) {
-            console.error('Register Error:', error);
             setMessage(error.response ? error.response.data.message : 'An error occurred.');
-            setTimeout(() => setMessage(''), 3000);
+        } finally {
+
         }
     };
 

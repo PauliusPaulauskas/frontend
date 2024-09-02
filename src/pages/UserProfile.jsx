@@ -15,7 +15,6 @@ function UserProfile() {
             try {
                 const response = await axios.get(`http://localhost:3000/users/${username}`);
                 setUserData(response.data);
-                console.log(response);
             } catch (error) {
                 console.error('Error fetching user data:', error);
             }
@@ -27,7 +26,9 @@ function UserProfile() {
     useEffect(() => {
         const fetchMessages = async () => {
             try {
-                const response = await axios.get(`http://localhost:3000/messages/${username}`);
+                const response = await axios.get(`http://localhost:3000/messages/${username}`, {
+                    headers: { Authorization: `Bearer ${secretCode}` } // Adjust if using a different method for auth
+                });
                 setMessages(response.data);
             } catch (error) {
                 console.error('Error fetching messages:', error);
@@ -35,7 +36,7 @@ function UserProfile() {
         };
 
         fetchMessages();
-    }, [username]);
+    }, [username, secretCode]);
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
@@ -65,7 +66,8 @@ function UserProfile() {
             flexDirection: "column",
             justifyContent: "start",
             alignItems: "center",
-            paddingTop: "100px"
+            paddingTop: "50px",
+            backgroundColor: "#f4f4f4"
         }}>
             {userData ? (
                 <>
@@ -73,32 +75,90 @@ function UserProfile() {
                     <img
                         src={userData.profileImage}
                         alt={userData.username}
-                        style={{width: 300, height: 300, borderRadius: '50%', border: "1px solid black"}}
+                        style={{
+                            width: 150,
+                            height: 150,
+                            borderRadius: '50%',
+                            border: "2px solid #ddd",
+                            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                            marginBottom: '20px'
+                        }}
                     />
                     {loggedInUsername !== username && (
-                        <form style={{display: "grid", marginTop: '20px'}} onSubmit={handleSendMessage}>
-                            <textarea value={newMessage} onChange={(e) => setNewMessage(e.target.value)}
-                                      placeholder="Type your message here..." required></textarea>
-                            <button type="submit">Send Message</button>
+                        <form style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center",
+                            width: "100%",
+                            maxWidth: "600px"
+                        }} onSubmit={handleSendMessage}>
+                            <textarea 
+                                value={newMessage}
+                                onChange={(e) => setNewMessage(e.target.value)}
+                                placeholder="Type your message here..."
+                                required
+                                style={{
+                                    width: "100%",
+                                    height: "100px",
+                                    padding: "10px",
+                                    borderRadius: "8px",
+                                    border: "1px solid #ccc",
+                                    resize: "none",
+                                    fontSize: "16px",
+                                    marginBottom: "10px"
+                                }}
+                            ></textarea>
+                            <button 
+                                type="submit"
+                                style={{
+                                    padding: "10px 20px",
+                                    border: "none",
+                                    borderRadius: "8px",
+                                    backgroundColor: "#007bff",
+                                    color: "#fff",
+                                    fontSize: "16px",
+                                    cursor: "pointer"
+                                }}
+                            >
+                                Send Message
+                            </button>
                         </form>
                     )}
-                    <div style={{width: "100%", marginTop: "20px", padding: "15px"}}>
+                    <div style={{
+                        width: "100%",
+                        maxWidth: "600px",
+                        marginTop: "20px",
+                        padding: "10px",
+                        backgroundColor: "#fff",
+                        borderRadius: "8px",
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                        maxHeight: "600px",
+                        overflowY: "auto" // Enables vertical scrolling
+                    }}>
                         <h3>Messages</h3>
                         {messages.length > 0 ? (
-                            <div style={{display: "grid", gridTemplateColumns: "repeat(4, 1fr", columnGap: "10px",}}>
+                            <div style={{
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "10px"
+                            }}>
                                 {messages.map((message, index) => (
                                     <div key={index} style={{
-                                        border: "1px solid black",
-                                        backgroundColor: "rgba(203,246,189,0.33)",
-                                        borderRadius: "10px",
-                                        margin: "10px 0",
-                                        padding: "10px"
+                                        border: "1px solid #ddd",
+                                        backgroundColor: "#f9f9f9",
+                                        borderRadius: "8px",
+                                        padding: "10px",
+                                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
                                     }}>
-                                        <h4>{message.sender}:</h4>
-                                        <p>{message.content}</p>
+                                        <div style={{
+                                            fontWeight: "bold",
+                                            marginBottom: "5px"
+                                        }}>{message.sender}:</div>
+                                        <p style={{ margin: "0 0 5px 0" }}>{message.content}</p>
                                         <p style={{
                                             fontSize: "0.8em",
-                                            color: "#888"
+                                            color: "#888",
+                                            margin: "0"
                                         }}>{new Date(message.timestamp).toLocaleString()}</p>
                                     </div>
                                 ))}
